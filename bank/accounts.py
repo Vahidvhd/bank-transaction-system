@@ -1,11 +1,10 @@
 from copy import deepcopy
 from datetime import datetime
 from uuid import uuid4
+from .decorators import validate_transaction
 
-#from bank.decorators import validate_transaction
 
-
-#@validate_transaction
+@validate_transaction
 def create_account(system, account_id, initial_balance, owner, account_type="Current"):
 
     if account_id in system["accounts"]:
@@ -50,7 +49,7 @@ def create_account(system, account_id, initial_balance, owner, account_type="Cur
         "status": "Account successfully created"
     }
 
-#@validate_transaction
+@validate_transaction
 def transfer(system, from_acc, to_acc, amount, description=""):
 
     if from_acc == to_acc:
