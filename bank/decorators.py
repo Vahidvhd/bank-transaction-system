@@ -2,7 +2,8 @@ from functools import wraps
 from copy import deepcopy
 from datetime import datetime
 import hashlib
-from bank.system import save_system
+from .system import save_system
+
 
 def validate_transaction(func):
     @wraps(func)
@@ -14,9 +15,11 @@ def validate_transaction(func):
 
             transaction_record = {
                 # TODO:
+
             }
 
             system['transaction_history'].append(transaction_record)
+
             save_system(system)
 
             return result
@@ -27,8 +30,3 @@ def validate_transaction(func):
             raise e
 
     return wrapper
-
-
-
-
-
