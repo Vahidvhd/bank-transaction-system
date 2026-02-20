@@ -12,6 +12,10 @@ def validate_transaction(func):
         try:
             result = func(system, *args, **kwargs)
 
+            transaction_record = {
+                # TODO:
+            }
+
             system['transaction_history'].append(transaction_record)
             save_system(system)
 
