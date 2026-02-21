@@ -1,26 +1,9 @@
 from bank.system import init_system, save_system
 from bank.accounts import create_account, transfer, gen_acc_id
 
-def demo(system):
-    print("Running demo...")
-
-    create_account(system, "A1001", 1000, {"name": "Vahid"})
-    create_account(system, "A1002", 500, {"name": "Saman"})
-
-    print("Before transfer:")
-    print("A1001:", system["accounts"]["A1001"]["balance"])
-    print("A1002:", system["accounts"]["A1002"]["balance"])
-
-    transfer(system, "A1001", "A1002", 200, "demo transfer")
-
-    print("After transfer:")
-    print("A1001:", system["accounts"]["A1001"]["balance"])
-    print("A1002:", system["accounts"]["A1002"]["balance"])
-
-    print("Demo finished ✅")
 
 def menu():
-    user_menu = input('Select one option:\n1: Log in\n2: Create account').strip()
+    user_menu = input('Select one option:\n1: Log in\n2: Create account\n').strip()
     return user_menu
 
 def create_acc(system):
@@ -58,9 +41,11 @@ def main():
     print("System loaded/initialized ✅")
     user_choice = menu()
     if user_choice == '1':
-        demo(system)
+        print('Login (coming soon)')
     elif user_choice == '2':
         create_acc(system)
+    else:
+        print('Invalid option')
 
 
 if __name__ == "__main__":
