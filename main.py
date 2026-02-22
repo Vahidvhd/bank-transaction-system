@@ -2,6 +2,9 @@ from bank.system import init_system, save_system
 from bank.accounts import create_account, transfer, gen_acc_id
 from bank.validators import validate_name_fname, validate_national_id, validate_password, validate_phone, validate_email
 import getpass
+import time
+import random
+import pyfiglet
 
 def menu():
     user_menu = input('Select one option:\n1: Log in\n2: Create account\n\n\n0: Exit\n>>>: ').strip()
@@ -16,6 +19,10 @@ def create_acc(system):
     password = validate_password('Password: ')
     phone = validate_phone('Phone: ')
     email = validate_email('Email: ')
+    is_human = captcha_check()
+    if not is_human:
+        print("Captcha doesn't match, please try again")
+        return
 
     owner_dict ={
     'name' : name,
@@ -46,20 +53,32 @@ def create_acc(system):
     except (TypeError , ValueError) as e:
         print('Error', e)
 
-def log_in(system):   
-    attemps =0
-    while attemps < 3:
-        acc_id = input('Account Number: ').strip()
-        password = getpass.getpass('Password: 🔑 ').strip()
-        user_acc = system.get('accounts',{}).get(acc_id)
-        if not user_acc or user_acc['owner']['password'] != password:
-            attemps += 1
-            print(f'Invalid account number or password ({3-attemps} left)')
-        else:
-            print(f"Welcome {user_acc['owner']['name']}")
-            return acc_id
-    print("Too many failed attempts. Returning to main menu.") # # TODO: Add lockout timer after 3 failed attempts
-    return None
+def log_in(system):  
+    while True: 
+        attempts =0
+        while attempts < 3:
+            acc_id = input('Account Number: ').strip()
+            password = getpass.getpass('Password: 🔑 ').strip()
+            user_acc = system.get('accounts',{}).get(acc_id)
+            is_human = captcha_check()
+            if not is_human:
+                attempts += 1
+                print(f"Captcha doesn't match, please try again ({3-attempts} left)")
+                continue
+            if not user_acc or user_acc['owner']['password'] != password:
+                attempts += 1
+                print(f'Invalid account number or password ({3-attempts} left)')
+                continue
+            else:
+                print(f"Welcome {user_acc['owner']['name']}")
+                return acc_id
+        
+        print('\nToo many failed attempts. Please wait 10 seconds.\n')
+        for i in range(10, 0, -1):
+            print(f"{i} ...")
+            time.sleep(1)
+        print('\nYou can try again now.\n')
+    
 def log_in_menu(system):
     print('***Log in***')
     login_menu = input('1: Log in with Account Number & Password\n2: Forgot Password\n\n\n3: Back\n>>>: ').strip()
@@ -73,9 +92,26 @@ def log_in_menu(system):
     else:
         print('Invalid option')
 
+
+
+
+def captcha_check():
+    chars = list('ABCDEFGHJKLMNPQRSTUVWXYZ23456789')
+    code = "".join(random.choices(chars, k=5))
+    print(pyfiglet.figlet_format(code, font="standard"))
+    ans = input("Type CAPTCHA: ").strip()
+    return ans == code
+
+
+
+
+
+
+
+
 def main():
     system = init_system()
-    print("System loaded/initialized ✅")
+    print('System loaded/initialized')
     while True:
         user_choice = menu()
         if user_choice == '1':
@@ -88,6 +124,17 @@ def main():
         else:
             print('Invalid option')
             continue
+
+
+
+
+
+
+
+
+
+
+
 
 if __name__ == "__main__":
     main()
