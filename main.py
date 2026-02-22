@@ -1,5 +1,6 @@
 from bank.system import init_system, save_system
 from bank.accounts import create_account, transfer, gen_acc_id
+from bank.validators import validate_name_fname, validate_national_id, validate_password, validate_phone, validate_email
 
 
 def menu():
@@ -9,8 +10,8 @@ def menu():
 def create_acc(system):
     print('***Create account***')
 
-    name = validate_name('Name: ')
-    fname = validate_fname('Surname: ')
+    name = validate_name_fname('Name: ')
+    fname = validate_name_fname('Surname: ')
     national_id = validate_national_id('National id: ')
     password = validate_password('Password: ')
     phone = validate_phone('Phone: ')
@@ -55,16 +56,17 @@ def log_in(system):
             attemps += 1
             print(f'Invalid account number or password ({3-attemps} left)')
         else:
-            print(f"Welcome {user_acc['owner']['Name']}")
+            print(f"Welcome {user_acc['owner']['name']}")
             return acc_id
-
+    print("Too many failed attempts. Returning to main menu.") # # TODO: Add lockout timer after 3 failed attempts
+    return None
 def log_in_menu(system):
     print('***Log in***')
     login_menu = input('1: Log in with Account Number & Password\n2: Forgot Password\n\n\n3: Back\n>>>: ').strip()
     if login_menu == '1':
         log_in(system)
     elif login_menu == '2':
-        # forgot pass
+        # TODO: implement forgot password feature
         pass
     elif login_menu == '3':
         return
