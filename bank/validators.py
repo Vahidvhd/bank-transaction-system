@@ -1,3 +1,6 @@
+import getpass
+
+
 def validate_name_fname(prompt):
     while True:
         name = input(prompt).strip()
@@ -15,8 +18,8 @@ def validate_national_id(prompt):
 
 def validate_password(prompt):
     while True:
-        password = input(prompt + ': 🔑 ').strip()
-        re_password = input('Confirm password: 🔑 ').strip()
+        password = getpass.getpass(prompt + ': 🔑 ').strip()
+        re_password = getpass.getpass('Confirm password: 🔑 ').strip()
 
         if len(password) < 8:
             print('Password must be at least 8 characters.')

@@ -1,7 +1,7 @@
 from bank.system import init_system, save_system
 from bank.accounts import create_account, transfer, gen_acc_id
 from bank.validators import validate_name_fname, validate_national_id, validate_password, validate_phone, validate_email
-
+import getpass
 
 def menu():
     user_menu = input('Select one option:\n1: Log in\n2: Create account\n\n\n0: Exit\n>>>: ').strip()
@@ -50,7 +50,7 @@ def log_in(system):
     attemps =0
     while attemps < 3:
         acc_id = input('Account Number: ').strip()
-        password = input('Password: ').strip()
+        password = getpass.getpass('Password: 🔑 ').strip()
         user_acc = system.get('accounts',{}).get(acc_id)
         if not user_acc or user_acc['owner']['password'] != password:
             attemps += 1
