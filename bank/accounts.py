@@ -98,57 +98,108 @@ def transfer(system, from_acc, to_acc, amount, description=""):
     if sender["balance"] < amount:
         raise ValueError("Insufficient balance")
 
-    sender = deepcopy(sender)
-    receiver = deepcopy(receiver)
+    system_backup = deepcopy(system)
 
-    now = datetime.now().isoformat()
-    tx_id = str(uuid4())
+    try:
+        sender = deepcopy(sender)
+        receiver = deepcopy(receiver)
 
-    sender_new_balance = float(sender["balance"]) - float(amount)
-    receiver_new_balance = float(receiver["balance"]) + float(amount)
+        now = datetime.now().isoformat()
+        tx_id = str(uuid4())
 
-    sender["balance"] = sender_new_balance
-    receiver["balance"] = receiver_new_balance
+        sender_new_balance = float(sender["balance"]) - float(amount)
+        receiver_new_balance = float(receiver["balance"]) + float(amount)
 
-    sender_tx = {
-        "id": tx_id,
-        "type": "Transfer Out",
-        "amount": float(amount),
-        "counterparty": to_acc,
-        "time": now,
-        "description": description or f"Transfer to {to_acc}",
-        "balance_after": sender_new_balance,
-    }
+        sender["balance"] = sender_new_balance
+        receiver["balance"] = receiver_new_balance
 
-    receiver_tx = {
-        "id": tx_id,
-        "type": "Transfer In",
-        "amount": float(amount),
-        "counterparty": from_acc,
-        "time": now,
-        "description": description or f"Transfer from {from_acc}",
-        "balance_after": receiver_new_balance,
-    }
+        sender_tx = {
+            "id": tx_id,
+            "type": "Transfer Out",
+            "amount": float(amount),
+            "counterparty": to_acc,
+            "time": now,
+            "description": description or f"Transfer to {to_acc}",
+            "balance_after": sender_new_balance,
+        }
 
-    sender.setdefault("transactions", [])
-    receiver.setdefault("transactions", [])
+        receiver_tx = {
+            "id": tx_id,
+            "type": "Transfer In",
+            "amount": float(amount),
+            "counterparty": from_acc,
+            "time": now,
+            "description": description or f"Transfer from {from_acc}",
+            "balance_after": receiver_new_balance,
+        }
 
-    sender["transactions"].append(sender_tx)
-    receiver["transactions"].append(receiver_tx)
+        sender.setdefault("transactions", [])
+        receiver.setdefault("transactions", [])
 
-    system["accounts"][from_acc] = sender
-    system["accounts"][to_acc] = receiver
+        sender["transactions"].append(sender_tx)
+        receiver["transactions"].append(receiver_tx)
+
+        system["accounts"][from_acc] = sender
+        system["accounts"][to_acc] = receiver
+
+        return {
+            "from": from_acc,
+            "to": to_acc,
+            "amount": float(amount),
+            "from_balance": sender_new_balance,
+            "to_balance": receiver_new_balance,
+            "status": "Transfer successful",
+        }
+
+    except Exception as e:
+        system.clear()
+        system.update(system_backup)
+
+        return {
+            "from": from_acc,
+            "to": to_acc,
+            "amount": amount,
+            "status": "Transfer failed - no changes applied",
+            "error": str(e),
+        }
+def batch_transfer(system, from_acc, transfers, description=""):
+
+    total_amount = 0.0
+    for to_acc, amount in transfers:
+        if not isinstance(amount, (int, float)):
+            raise TypeError("Amount must be numeric")
+        if amount <= 0:
+            raise ValueError("Amount must be positive")
+        total_amount += float(amount)
+
+    sender_balance = float(system["accounts"][from_acc]["balance"])
+    if sender_balance < total_amount:
+        raise ValueError("Insufficient balance for batch transfer")
+
+    results = []
+    success_count = 0
+    failed_accounts = []
+
+    for to_acc, amount in transfers:
+        result = transfer(system, from_acc, to_acc, amount, description=description)
+
+        if result.get("status") == "Transfer successful":
+            success_count += 1
+        else:
+            failed_accounts.append(to_acc)
+
+        results.append(result)
 
     return {
         "from": from_acc,
-        "to": to_acc,
-        "amount": float(amount),
-        "from_balance": sender_new_balance,
-        "to_balance": receiver_new_balance,
-        "status": "Transfer successful",
+        "total_transfers": len(results),
+        "successful": success_count,
+        "failed": len(failed_accounts),
+        "failed_accounts": failed_accounts,
+        "details": results,
+        "status": "Batch completed"
     }
-def bach_transfer():
-    pass
+
 def create_cart(system, account_number):
     person_data = deepcopy(system["accounts"][account_number])
     card_numbers = set(collect_account_fields(system, "cart_data", "cart_number"))
