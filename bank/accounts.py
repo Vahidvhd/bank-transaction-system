@@ -220,3 +220,9 @@ def create_cart(system, account_number):
             "card_number": cart_data["cart_number"],
             "status": "Card successfully created"
     }
+def load_csv():
+    pass
+"""
+TODO:چک کردن تاریخ انقضا اسکیریپتی
+
+"""
