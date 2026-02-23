@@ -1,15 +1,35 @@
+import secrets
+import string
 from copy import deepcopy
 from datetime import datetime
+from operator import truediv
 from uuid import uuid4
-from .decorators import validate_transaction
+# from .decorators import validate_transaction
+def create_national_ids(system, key_1, key_2) :
+    result = []
+    for value in system.values():
+        for v in value.values():
+            item = v.get(key_1, {}).get(key_2)
+            if item:
+                result.append(item)
+    return result
 
+def create_expiration_date():
+    now = datetime.now().date()
+    expiration_date = now.replace(year=now.year + 5)
+    return now.isoformat(), expiration_date.isoformat()
 
-@validate_transaction
-def create_account(system, account_id, initial_balance, owner, account_type="Current"):
+def accnumber_cvv_cartnumber_(prefix = "6037", length=16):
+    length_1 = length - len(prefix)
+    random_number =''
+    random_number += ''.join(secrets.choice(string.digits)for _ in range(length_1))
+    return prefix + random_number
 
-    if account_id in system["accounts"]:
-        raise ValueError("Account ID already exists")
-
+#@validate_transaction
+def create_account(system, initial_balance, owner, account_type="Current"):
+    national_ids = create_national_ids(system, key_1="owner", key_2="national_id")
+    if owner["national_id"] in national_ids:
+        raise ValueError("Create Account is fail")
     if not isinstance(initial_balance, (int, float)):
         raise TypeError("Initial balance must be numeric")
 
@@ -18,6 +38,11 @@ def create_account(system, account_id, initial_balance, owner, account_type="Cur
 
     if not isinstance(owner, dict):
         raise TypeError("Owner must be a dictionary")
+    while True:
+        account_number = accnumber_cvv_cartnumber_(prefix="", length=13)
+        if account_number not in system.keys():
+            system["accounts"][account_number] = {}
+            break
 
     current_time = datetime.now().isoformat()
 
@@ -41,15 +66,15 @@ def create_account(system, account_id, initial_balance, owner, account_type="Cur
 
     account_data["transactions"].append(opening_transaction)
 
-    system["accounts"][account_id] = account_data
+    system["accounts"][account_number] = account_data
 
     return {
-        "account_id": account_id,
+        "account_id": account_number,
         "balance": float(initial_balance),
         "status": "Account successfully created"
     }
 
-@validate_transaction
+#@validate_transaction
 def transfer(system, from_acc, to_acc, amount, description=""):
 
     if from_acc == to_acc:
@@ -122,3 +147,20 @@ def transfer(system, from_acc, to_acc, amount, description=""):
         "to_balance": receiver_new_balance,
         "status": "Transfer successful",
     }
+def bach_transfer():
+    pass
+def create_cart(system, account_number):
+    person_data = deepcopy(system["accounts"][account_number])
+    cart_numbers = create_national_ids(system, "cart_data", "cart_number")
+    while True:
+        cart_number = accnumber_cvv_cartnumber_()
+        if cart_number not in cart_numbers:
+            person_data["cart_data"]["cart_number"] = cart_number
+            person_data["cart_data"]["cvv"] = accnumber_cvv_cartnumber_(prefix='', length=3)
+            break
+    expiration_date = create_expiration_date()
+    person_data["cart_data"]["create_date"] = expiration_date[0]
+    person_data["cart_data"]["expiration_date"] = expiration_date[1]
+
+
+
