@@ -5,13 +5,14 @@ from datetime import datetime
 from operator import truediv
 from uuid import uuid4
 # from .decorators import validate_transaction
-def create_national_ids(system, key_1, key_2) :
+def collect_account_fields(system, key_1, key_2):
     result = []
-    for value in system.values():
-        for v in value.values():
-            item = v.get(key_1, {}).get(key_2)
-            if item:
-                result.append(item)
+    for acc in system.get("accounts", {}).values():
+        section = acc.get(key_1)
+        if isinstance(section, dict):
+            value = section.get(key_2)
+            if value is not None:
+                result.append(value)
     return result
 
 def create_expiration_date():
@@ -27,7 +28,7 @@ def accnumber_cvv_cartnumber_(prefix = "6037", length=16):
 
 #@validate_transaction
 def create_account(system, initial_balance, owner, account_type="Current"):
-    national_ids = create_national_ids(system, key_1="owner", key_2="national_id")
+    national_ids = collect_account_fields(system, "owner", "national_id")
     if owner["national_id"] in national_ids:
         raise ValueError("Create Account is fail")
     if not isinstance(initial_balance, (int, float)):
@@ -40,8 +41,7 @@ def create_account(system, initial_balance, owner, account_type="Current"):
         raise TypeError("Owner must be a dictionary")
     while True:
         account_number = accnumber_cvv_cartnumber_(prefix="", length=13)
-        if account_number not in system.keys():
-            system["accounts"][account_number] = {}
+        if account_number not in system["accounts"]:
             break
 
     current_time = datetime.now().isoformat()
@@ -151,16 +151,21 @@ def bach_transfer():
     pass
 def create_cart(system, account_number):
     person_data = deepcopy(system["accounts"][account_number])
-    cart_numbers = create_national_ids(system, "cart_data", "cart_number")
+    card_numbers = set(collect_account_fields(system, "cart_data", "cart_number"))
+    cart_data = person_data.setdefault("cart_data", {})
     while True:
         cart_number = accnumber_cvv_cartnumber_()
-        if cart_number not in cart_numbers:
-            person_data["cart_data"]["cart_number"] = cart_number
-            person_data["cart_data"]["cvv"] = accnumber_cvv_cartnumber_(prefix='', length=3)
+        if cart_number not in card_numbers:
+            cart_data["cart_number"] = cart_number
+            cart_data["cvv"] = accnumber_cvv_cartnumber_(prefix='', length=3)
             break
     expiration_date = create_expiration_date()
-    person_data["cart_data"]["create_date"] = expiration_date[0]
-    person_data["cart_data"]["expiration_date"] = expiration_date[1]
+    cart_data["create_date"] = expiration_date[0]
+    cart_data["expiration_date"] = expiration_date[1]
+    system["accounts"][account_number] = person_data
 
-
-
+    return {
+            "account_id": account_number,
+            "card_number": cart_data["cart_number"],
+            "status": "Card successfully created"
+    }
