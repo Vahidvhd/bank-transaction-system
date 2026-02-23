@@ -5,6 +5,7 @@ import getpass
 import time
 import random
 import pyfiglet
+from bank.verification.email_verification import send_email_gmail
 
 def menu():
     user_menu = input('Select one option:\n1: Log in\n2: Create account\n\n\n0: Exit\n>>>: ').strip()
@@ -78,22 +79,40 @@ def log_in(system):
             print(f"{i} ...")
             time.sleep(1)
         print('\nYou can try again now.\n')
-    
+
+def forgot_pass(system):
+    while True:
+        print("\n*** Forgot Password ***")
+        forgot_menu= input("1: Get password by email\n\n2: Back\n>>>: ").strip()
+        if forgot_menu == '1': 
+            national_id = input('National id Number: ')
+            email = input('Email: ')
+            print('If the information you provided matches an existing account, we’ll send an email to the address you entered. Please also check your Spam/Junk folder.')
+            for acc_id, acc_data in system.get('accounts', {}).items():
+                owner = acc_data.get('owner', {})
+                if owner.get('national_id')== national_id and owner.get('contact', {}).get('email') == email:
+                    password = owner.get('password')
+                    owner_name = owner.get('name')
+                    owner_fname = owner.get('fname')
+                    send_email_gmail(email, password, owner_name, owner_fname)
+                    break
+        elif forgot_menu == '2':
+            return
+        else:
+            print('Invalid option')
+            continue
+
 def log_in_menu(system):
     print('***Log in***')
     login_menu = input('1: Log in with Account Number & Password\n2: Forgot Password\n\n\n3: Back\n>>>: ').strip()
     if login_menu == '1':
         log_in(system)
     elif login_menu == '2':
-        # TODO: implement forgot password feature
-        pass
+        forgot_pass(system)
     elif login_menu == '3':
         return
     else:
         print('Invalid option')
-
-
-
 
 def captcha_check():
     chars = list('ABCDEFGHJKLMNPQRSTUVWXYZ23456789')
@@ -101,13 +120,6 @@ def captcha_check():
     print(pyfiglet.figlet_format(code, font="standard"))
     ans = input("Type CAPTCHA: ").strip()
     return ans == code
-
-
-
-
-
-
-
 
 def main():
     system = init_system()
@@ -124,17 +136,6 @@ def main():
         else:
             print('Invalid option')
             continue
-
-
-
-
-
-
-
-
-
-
-
 
 if __name__ == "__main__":
     main()
