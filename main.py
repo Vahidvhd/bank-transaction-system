@@ -6,6 +6,12 @@ import time
 import random
 import pyfiglet
 from bank.verification.email_verification import send_email_gmail
+import os
+
+
+def clear_terminal():
+    os.system('cls')
+    # print banner
 
 def menu():
     user_menu = input('Select one option:\n1: Log in\n2: Create account\n\n\n0: Exit\n>>>: ').strip()
@@ -72,11 +78,12 @@ def log_in(system):
                 continue
             else:
                 print(f"Welcome {user_acc['owner']['name']}")
-                return acc_id
+                log_in_menu(system, acc_id)
+                return
         
         print('\nToo many failed attempts. Please wait 10 seconds.\n')
         for i in range(10, 0, -1):
-            print(f"{i} ...")
+            print(f'{i} ...')
             time.sleep(1)
         print('\nYou can try again now.\n')
 
@@ -102,17 +109,55 @@ def forgot_pass(system):
             print('Invalid option')
             continue
 
-def log_in_menu(system):
+def log_in_options(system):
     print('***Log in***')
-    login_menu = input('1: Log in with Account Number & Password\n2: Forgot Password\n\n\n3: Back\n>>>: ').strip()
+    login_menu = input('1: Log in with Account Number & Password\n2: Forgot Password\n\n\n0: Back\n>>>: ').strip()
     if login_menu == '1':
         log_in(system)
     elif login_menu == '2':
         forgot_pass(system)
-    elif login_menu == '3':
+    elif login_menu == '0':
         return
     else:
         print('Invalid option')
+
+def log_in_menu(system, acc_id):
+    while True:
+        print("\n***Dashboard***")
+        print("1: View your profile")
+        print("2: View balance")
+        print("3: transactions history")
+        print("4: Transfer")
+        print("5: Batch transfer")
+        print("0: Logout")
+        choice = input(">>> ").strip()
+
+        if choice == "1":
+            show_user_info(system, acc_id)  
+        elif choice == "2":
+            show_balance(system, acc_id, limit=10)
+        elif choice == "3":
+            user_transfer(system, acc_id)
+        elif choice == "4":
+            user_batch_transfer(system, acc_id)
+        elif choice == "0":
+            print("Logged out.\n")
+            return
+        else:
+            print("Invalid option.")
+
+
+def show_user_info(system, acc_id):
+    pass
+
+def show_balance(system, acc_id, limit=10):
+    pass
+
+def user_transfer(system, acc_id):
+    pass
+
+def user_batch_transfer(system, acc_id):
+    pass
 
 def captcha_check():
     chars = list('ABCDEFGHJKLMNPQRSTUVWXYZ23456789')
@@ -121,13 +166,15 @@ def captcha_check():
     ans = input("Type CAPTCHA: ").strip()
     return ans == code
 
+
+
 def main():
     system = init_system()
     print('System loaded/initialized')
     while True:
         user_choice = menu()
         if user_choice == '1':
-            log_in_menu(system)
+            log_in_options(system)
         elif user_choice == '2':
             create_acc(system)
         elif user_choice == '0':
