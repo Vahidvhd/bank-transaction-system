@@ -78,7 +78,7 @@ def log_in(system):
                 continue
             else:
                 print(f"Welcome {user_acc['owner']['name']}")
-                log_in_menu(system, acc_id)
+                log_in_menu(system, acc_id, user_acc)
                 return
         
         print('\nToo many failed attempts. Please wait 10 seconds.\n')
@@ -121,24 +121,31 @@ def log_in_options(system):
     else:
         print('Invalid option')
 
-def log_in_menu(system, acc_id):
+def log_in_menu(system, acc_id, user_acc):
     while True:
-        print("\n***Dashboard***")
+        user_acc = system.get('accounts').get(acc_id)
+        owner = user_acc.get('owner')
+        name = owner.get('name')
+        fname = owner.get('fname')
+        balance = user_acc.get('balance', 0)
+        national_id = user_acc.get('owner', {}).get('national_id')
+        phone = user_acc.get('owner', {}).get('contact', {}).get('phone')
+        email = user_acc.get('owner', {}).get('contact', {}).get('email')
+
+        print("\n***Dashboard***\n")
+        print(f'Welcome {name} {fname}                  Balance: {balance}')
+
         print("1: View your profile")
-        print("2: View balance")
-        print("3: transactions history")
-        print("4: Transfer")
-        print("5: Batch transfer")
-        print("0: Logout")
+        print("2: Transfer")
+        print("3: Batch transfer")
+        print("\n\n0: Logout")
         choice = input(">>> ").strip()
 
         if choice == "1":
-            show_user_info(system, acc_id)  
+            show_user_info(name, fname, national_id, phone, email)  
         elif choice == "2":
-            show_balance(system, acc_id, limit=10)
-        elif choice == "3":
             user_transfer(system, acc_id)
-        elif choice == "4":
+        elif choice == "3":
             user_batch_transfer(system, acc_id)
         elif choice == "0":
             print("Logged out.\n")
@@ -147,11 +154,17 @@ def log_in_menu(system, acc_id):
             print("Invalid option.")
 
 
-def show_user_info(system, acc_id):
-    pass
+def show_user_info(name, fname, national_id, phone, email):
+    print("\n***My info***\n\n")
+    print(f'Name: {name}')
+    print(f'Family Name: {fname}')
+    print(f'National ID: {national_id}')
+    print(f'Phone: {phone}')
+    print(f'Email: {email}')
+    user_choice = input('\n\n 0: Back')
+    if user_choice == '0':
+        return
 
-def show_balance(system, acc_id, limit=10):
-    pass
 
 def user_transfer(system, acc_id):
     pass
