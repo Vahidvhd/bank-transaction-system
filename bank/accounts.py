@@ -221,8 +221,9 @@ def create_cart(system, account_number):
             "status": "Card successfully created"
     }
 def load_csv():
+    a=2+2
     pass
 """
 TODO:چک کردن تاریخ انقضا اسکیریپتی
-
+سلام
 """
