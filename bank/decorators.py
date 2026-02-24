@@ -1,15 +1,10 @@
 from typing import Callable, Dict
 from datetime import datetime
-from typing import Callable, Dict
-from datetime import datetime
 from functools import wraps
 from copy import deepcopy
 # import hashlib
 from .system import save_system
 
-
-def validate_transaction(func: Callable) -> Callable:
-    """Decorator to ensure transactional safety for critical bank operations."""
 
 def validate_transaction(func: Callable) -> Callable:
     """Decorator to ensure transactional safety for critical bank operations."""
@@ -37,11 +32,11 @@ def validate_transaction(func: Callable) -> Callable:
             system["transaction_history"].append(transaction_record)
             save_system(system)
 
-        #     return result
+            return result
 
-        # except Exception as e:
-        #     system.clear()
-        #     system.update(snapshot)
-        #     raise e
+        except Exception as e:
+            system.clear()
+            system.update(snapshot)
+            raise e
 
     return wrapper
