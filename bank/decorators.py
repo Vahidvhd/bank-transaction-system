@@ -2,6 +2,7 @@ from typing import Callable, Dict
 from datetime import datetime
 from functools import wraps
 from copy import deepcopy
+# import hashlib
 from .system import save_system
 
 
@@ -10,28 +11,32 @@ def validate_transaction(func: Callable) -> Callable:
 
     @wraps(func)
     def wrapper(system: Dict, *args, **kwargs):
-        # snapshot = deepcopy(system)
+        snapshot = deepcopy(system)
 
-        # try:
-        #     result = func(system, *args, **kwargs)
-        #     timestamp = datetime.now().isoformat()
-        #     system_string = str(system).encode()
+        try:
+            result = func(system, *args, **kwargs)
 
-        #     transaction_record = {
-        #         'args': args,
-        #         'kwargs': kwargs,
-        #         "timestamp": timestamp,
-        #         # TODO:
-        #     }
+            timestamp = datetime.now().isoformat()
+            # system_string = str(system).encode()
+            # system_hash = hashlib.sha256(system_string).hexdigest()
 
-        #     system["transaction_history"].append(transaction_record)
-        #     save_system(system)
+            transaction_record = {
+                "action": func.__name__,
+                # "args": args,
+                # "kwargs": kwargs,
+                "action_time": timestamp,
+                # "system_hash": system_hash,
+                "success": True,
+            }
 
-        #     return result
+            system["transaction_history"].append(transaction_record)
+            save_system(system)
 
-        # except Exception as e:
-        #     system.clear()
-        #     system.update(snapshot)
-        #     raise e
+            return result
+
+        except Exception as e:
+            system.clear()
+            system.update(snapshot)
+            raise e
 
     return wrapper
