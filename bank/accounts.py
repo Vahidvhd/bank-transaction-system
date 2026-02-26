@@ -57,7 +57,7 @@ def resolve_account_number(system, identifier):
         cart_data = account_data.get("cart_data")
         if isinstance(cart_data, dict):
             card_number = cart_data.get("cart_number")
-            if card_number and card_number == identifier:
+            if card_number and str(card_number).strip().replace(" ", "") == identifier:
                 return account_id
 
     raise KeyError(f"Account or Card not found: {identifier}")
