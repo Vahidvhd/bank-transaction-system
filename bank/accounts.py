@@ -2,6 +2,7 @@ import secrets
 import string
 from copy import deepcopy
 from datetime import datetime
+from datetime import date
 from operator import truediv
 from uuid import uuid4
 # from .decorators import validate_transaction
@@ -26,6 +27,48 @@ def accnumber_cvv_cartnumber_(prefix = "6037", length=16):
     random_number += ''.join(secrets.choice(string.digits)for _ in range(length_1))
     return prefix + random_number
 
+def load_csv(file_name):
+    accounts = []
+
+    with open(file_name, "r", encoding="utf-8") as file:
+        for line in file:
+            account = line.strip()
+            account = account.replace(" ", "")
+            if account:
+                accounts.append(account)
+
+    if not accounts:
+        raise ValueError("CSV file is empty or contains only empty lines.")
+
+    return accounts
+def resolve_account_number(system, identifier):
+
+    identifier = str(identifier).strip().replace(" ", "")
+
+    if not identifier:
+        raise KeyError("Account/Card identifier is empty")
+
+    accounts = system.get("accounts", {})
+
+    if identifier in accounts:
+        return identifier
+
+    for account_id, account_data in accounts.items():
+        cart_data = account_data.get("cart_data")
+
+        if not isinstance(cart_data, dict):
+            continue
+
+        card_number = cart_data.get("cart_number")
+
+        if card_number and str(card_number).strip().replace(" ", "") == identifier:
+
+            if cart_data.get("status") == "Expired":
+                raise ValueError("Card is expired")
+
+            return account_id
+
+    raise KeyError(f"Account or Card not found: {identifier}")
 #@validate_transaction
 def create_account(system, initial_balance, owner, account_type="Current"):
     national_ids = collect_account_fields(system, "owner", "national_id")
@@ -76,15 +119,11 @@ def create_account(system, initial_balance, owner, account_type="Current"):
 
 #@validate_transaction
 def transfer(system, from_acc, to_acc, amount, description=""):
-
+    from_acc = resolve_account_number(system, from_acc)
+    to_acc = resolve_account_number(system, to_acc)
     if from_acc == to_acc:
         raise ValueError("Sender and receiver accounts must be different")
 
-    if from_acc not in system["accounts"]:
-        raise KeyError(f"Sender account not found: {from_acc}")
-
-    if to_acc not in system["accounts"]:
-        raise KeyError(f"Receiver account not found: {to_acc}")
 
     if not isinstance(amount, (int, float)):
         raise TypeError("Amount must be numeric")
@@ -162,16 +201,17 @@ def transfer(system, from_acc, to_acc, amount, description=""):
             "status": "Transfer failed - no changes applied",
             "error": str(e),
         }
-def batch_transfer(system, from_acc, transfers, description=""):
 
-    total_amount = 0.0
-    for to_acc, amount in transfers:
-        if not isinstance(amount, (int, float)):
-            raise TypeError("Amount must be numeric")
-        if amount <= 0:
-            raise ValueError("Amount must be positive")
-        total_amount += float(amount)
+def batch_transfer(system, from_acc, amount, file_name, description=""):
+    from_acc = resolve_account_number(system, from_acc)
+    transfers = load_csv(file_name)
 
+    if not isinstance(amount, (int, float)):
+        raise TypeError("Amount must be numeric")
+    if amount <= 0:
+        raise ValueError("Amount must be positive")
+
+    total_amount = float(amount) * len(transfers)
     sender_balance = float(system["accounts"][from_acc]["balance"])
     if sender_balance < total_amount:
         raise ValueError("Insufficient balance for batch transfer")
@@ -180,8 +220,17 @@ def batch_transfer(system, from_acc, transfers, description=""):
     success_count = 0
     failed_accounts = []
 
-    for to_acc, amount in transfers:
-        result = transfer(system, from_acc, to_acc, amount, description=description)
+    for to_acc in transfers:
+        try:
+            result = transfer(system, from_acc, to_acc, amount, description=description)
+        except Exception as e:
+            result = {
+                "from": from_acc,
+                "to": to_acc,
+                "amount": float(amount),
+                "status": "Transfer failed",
+                "error": str(e),
+            }
 
         if result.get("status") == "Transfer successful":
             success_count += 1
@@ -209,6 +258,7 @@ def create_cart(system, account_number):
         if cart_number not in card_numbers:
             cart_data["cart_number"] = cart_number
             cart_data["cvv"] = accnumber_cvv_cartnumber_(prefix='', length=3)
+            cart_data["status"] = "Active"
             break
     expiration_date = create_expiration_date()
     cart_data["create_date"] = expiration_date[0]
@@ -220,11 +270,25 @@ def create_cart(system, account_number):
             "card_number": cart_data["cart_number"],
             "status": "Card successfully created"
     }
-def load_csv():
-    a=2+2
-    b=3+3
-    pass
-"""
-TODO:چک کردن تاریخ انقضا اسکیریپتی
-سلام
-"""
+
+def deactivate_expired_cards(system):
+    today = date.today()
+    updated_accounts = []
+
+    for acc_id, acc in system.get("accounts", {}).items():
+        cart_data = acc.get("cart_data")
+        if not isinstance(cart_data, dict):
+            continue
+
+        exp_str = cart_data.get("expiration_date")
+        if not exp_str:
+            continue
+
+        exp_date = date.fromisoformat(exp_str)
+
+        if today > exp_date:
+            cart_data["status"] = "Expired"
+            updated_accounts.append(acc_id)
+
+    return updated_accounts
+
