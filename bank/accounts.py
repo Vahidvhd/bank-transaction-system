@@ -55,10 +55,18 @@ def resolve_account_number(system, identifier):
 
     for account_id, account_data in accounts.items():
         cart_data = account_data.get("cart_data")
-        if isinstance(cart_data, dict):
-            card_number = cart_data.get("cart_number")
-            if card_number and str(card_number).strip().replace(" ", "") == identifier:
-                return account_id
+
+        if not isinstance(cart_data, dict):
+            continue
+
+        card_number = cart_data.get("cart_number")
+
+        if card_number and str(card_number).strip().replace(" ", "") == identifier:
+
+            if cart_data.get("status") == "Expired":
+                raise ValueError("Card is expired")
+
+            return account_id
 
     raise KeyError(f"Account or Card not found: {identifier}")
 #@validate_transaction
