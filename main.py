@@ -1,5 +1,5 @@
 from bank.system import init_system, save_system
-from bank.accounts import create_account, transfer, gen_acc_id
+from bank.accounts import create_account, transfer, batch_transfer
 from bank.validators import validate_name_fname, validate_national_id, validate_password, validate_phone, validate_email
 import getpass
 import time
@@ -10,7 +10,7 @@ import os
 
 
 def clear_terminal():
-    os.system('cls')
+    os.system('cls' if os.name == 'nt' else 'clear')
     # print banner
 
 def menu():
@@ -51,10 +51,8 @@ def create_acc(system):
             print('Initial balance cannot contain any letters of special characters')
             continue
     
-    account_id = gen_acc_id(system)
-
     try:
-        result = create_account(system, account_id, init_amount, owner_dict)
+        result = create_account(system, init_amount, owner_dict)
         save_system(system)
         print(f"{result['status']}\nAccount number: {result['account_id']}\nBalance: {result['balance']}")
     except (TypeError , ValueError) as e:
@@ -103,6 +101,9 @@ def forgot_pass(system):
                     owner_fname = owner.get('fname')
                     send_email_gmail(email, password, owner_name, owner_fname)
                     break
+            input("\n\nPress Enter to continue...")
+            return
+
         elif forgot_menu == '2':
             return
         else:
