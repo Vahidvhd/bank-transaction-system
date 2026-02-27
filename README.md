@@ -1,17 +1,121 @@
-# bank-transaction-system
-## A modular banking transaction system focused on functional design, transaction validation, and persistent state management.
+# **Vault-Tec Bank**
 
-<!-- ## Project Overview
+## **Project Title & Overview**
 
-### TODO:
+## Bank Transaction System
 
-## Project Structure Explanation
+### This project is a modular banking transaction system implemented in Python.
 
-### TODO:
+The system is designed using functional programming principles and ensures data integrity through deep copy mechanisms and automatic rollback on failure.
 
-## How to Run the Project
+The main goal of this project is to simulate a simplified banking core system that supports:
 
-### TODO:
+Account creation
+
+Secure money transfers
+
+Batch transfers
+
+Transaction history tracking
+
+Persistent state storage using pickle
+
+The system guarantees consistency by validating transactions before applying changes and restoring the previous state in case of errors
+
+## Features
+
+Functional-style design with modular structure
+
+Safe transaction execution using a validation decorator
+
+Automatic rollback on failure
+
+Persistent data storage using pickle
+
+Transaction logging with timestamps and system hash
+
+Metadata tracking (created_at, last_modified, version)
+
+Clean code structure (PEP8 compliant)
+
+Modular architecture suitable for extension
+
+## Project Structure
+
+bank-transaction-system/
+│
+├── bank/
+│   ├── __init__.py
+│   ├── system.py
+│   ├── decorators.py
+│   ├── accounts.py
+│   ├── verification/
+│        ├── __init__.py
+│        ├── email_verification.py
+│        ├── logo.jpg
+├── main.py
+├── README.md
+├── .gitignore
+└── License
+
+### system.py
+
+Responsible for system lifecycle management:
+
+init_system()
+
+load_system()
+
+save_system()
+
+Handles pickle persistence and metadata updates.
+
+### decorators.py
+
+Contains:
+
+validate_transaction decorator
+
+This decorator:
+
+Takes a deepcopy snapshot before execution
+
+Executes the main function
+
+On success → logs transaction + saves system
+
+On error → restores previous state
+
+### accounts.py
+
+Contains core banking operations:
+
+create_account()
+
+transfer()
+
+batch_transfer()
+
+All critical operations are decorated with @validate_transaction.
+
+### main.py
+
+Demonstrates example usage of the system and how to call main functions.
+
+## Installation & Running
+
+### Clone the repository
+
+git clone https://github.com/Vahidvhd/bank-transaction-system.git
+cd bank-transaction-system
+
+### Run the project
+
+python main.py
+
+If bank_data.pkl does not exist, the system automatically creates a new one.
+
+No external dependencies are required beyond standard Python libraries
 
 ## Example Usage
 
