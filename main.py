@@ -270,7 +270,7 @@ def log_in_menu(system, acc_id, user_acc):
         elif choice == "3":
             user_batch_transfer(system, acc_id)
         elif choice == "0":
-            print("Logged out.\n")
+            type_print("Logged out.\n")
             pause(1)
             return
         else:
@@ -280,12 +280,12 @@ def log_in_menu(system, acc_id, user_acc):
 
 def show_user_info(name, fname, national_id, phone, email):
     clear_terminal() 
-    print("\n***My info***\n\n")
-    print(f'Name: {name}')
-    print(f'Family Name: {fname}')
-    print(f'National ID: {national_id}')
-    print(f'Phone: {phone}')
-    print(f'Email: {email}')
+    type_print("\n***My info***\n\n")
+    type_print(f'Name: {name}')
+    type_print(f'Family Name: {fname}')
+    type_print(f'National ID: {national_id}')
+    type_print(f'Phone: {phone}')
+    type_print(f'Email: {email}')
     user_choice = input('\n\n 0: Back\n>>>: ')
     if user_choice == '0':
         return
@@ -311,7 +311,7 @@ def user_transfer(system, acc_id):
         save_system(system)
         print_green("\n", result["status"])
         print("From balance:", result["from_balance"])
-        print("To balance:", result["to_balance"])
+        print("(for testing) To balance:", result["to_balance"])
         pause()
     except Exception as e:
         print_red("\nTransfer failed:", e)
@@ -371,7 +371,7 @@ def main():
         elif user_choice == '2':
             create_acc(system)
         elif user_choice == '0':
-            print('Exiting system...')
+            type_print('Exiting system...')
             pause()
             save_system(system)
             print('Goodbye')
