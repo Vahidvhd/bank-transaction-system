@@ -124,7 +124,12 @@ def log_in_options(system):
 
 def log_in_menu(system, acc_id, user_acc):
     while True:
-        user_acc = system.get('accounts').get(acc_id)
+        user_acc = system.get('accounts', {}).get(acc_id)
+
+        if not user_acc:
+            print('Account not found.')
+            return
+
         owner = user_acc.get('owner')
         name = owner.get('name')
         fname = owner.get('fname')
@@ -168,10 +173,78 @@ def show_user_info(name, fname, national_id, phone, email):
 
 
 def user_transfer(system, acc_id):
-    pass
+    print("\n*** Transfer ***")
+    to_acc = input("Destination (Account/Card number): ").strip()
+
+    while True:
+        amount_str = input("Amount: ").strip()
+        try:
+            amount = float(amount_str)
+            break
+        except ValueError:
+            print("Amount must be numeric.")
+
+    info = input("Description (optional): ").strip()
+
+    try:
+        result = transfer(system, acc_id, to_acc, amount, info)
+        save_system(system)
+        print("\n", result["status"])
+        print("From balance:", result["from_balance"])
+        print("To balance:", result["to_balance"])
+    except Exception as e:
+        print("\nTransfer failed:", e)
+
+    input("\nPress Enter to continue...")    
 
 def user_batch_transfer(system, acc_id):
-    pass
+    print("\n*** Batch Transfer ***")
+    file_name = input("CSV file path (one account/card per line): ").strip()
+
+    while True:
+        amount_str = input("Amount for each transfer: ").strip()
+        try:
+            amount = float(amount_str)
+            break
+        except ValueError:
+            print("Amount must be numeric.")
+
+    info = input("Description (optional): ").strip()
+
+    try:
+        result = batch_transfer(system, acc_id, amount, file_name, info)
+        save_system(system)
+        print("\n", result["status"])
+        print("Total:", result["total_transfers"])
+        print("Successful:", result["successful"])
+        print("Failed:", result["failed"])
+        if result["failed_accounts"]:
+            print("Failed accounts:", result["failed_accounts"])
+    except Exception as e:
+        print("\nBatch transfer failed:", e)
+
+    input("\nPress Enter to continue...")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 def captcha_check():
     chars = list('ABCDEFGHJKLMNPQRSTUVWXYZ23456789')
