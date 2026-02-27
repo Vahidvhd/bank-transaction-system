@@ -4,7 +4,7 @@ from copy import deepcopy
 from datetime import datetime
 from datetime import date
 from uuid import uuid4
-# from .decorators import validate_transaction
+from .decorators import validate_transaction
 def collect_account_fields(system, key_1, key_2):
     result = []
     for acc in system.get("accounts", {}).values():
@@ -68,7 +68,7 @@ def resolve_account_number(system, identifier):
             return account_id
 
     raise KeyError(f"Account or Card not found: {identifier}")
-#@validate_transaction
+@validate_transaction
 def create_account(system, initial_balance, owner, account_type="Current"):
     national_ids = collect_account_fields(system, "owner", "national_id")
     if owner["national_id"] in national_ids:
@@ -116,7 +116,7 @@ def create_account(system, initial_balance, owner, account_type="Current"):
         "status": "Account successfully created"
     }
 
-#@validate_transaction
+@validate_transaction
 def transfer(system, from_acc, to_acc, amount, description=""):
     from_acc = resolve_account_number(system, from_acc)
     to_acc = resolve_account_number(system, to_acc)
