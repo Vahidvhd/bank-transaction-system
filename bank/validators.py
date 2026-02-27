@@ -52,9 +52,9 @@ def validate_password(prompt):
 def validate_phone(prompt):
     while True:
         phone = input(prompt).strip()
-        if phone.isdigit() and len(phone) == 11 and phone.startswith('09'):
+        if phone.isdigit() and len(phone) == 11 and phone.startswith('0'):
             return phone
-        print('Phone must be 11 digits and start with 09XXXXXXXXX.')
+        print('Phone must be 11 digits and start with 0XXXXXXXXXX.')
 
 def validate_email(prompt):
     while True:
