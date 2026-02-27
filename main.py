@@ -51,13 +51,46 @@ def menu():
 def create_acc(system):
     clear_terminal()
     print('***Create account***')
-
-    name = validate_name_fname('Name: ')
-    fname = validate_name_fname('Surname: ')
-    national_id = validate_national_id('National id: ')
-    password = validate_password('Password: ')
-    phone = validate_phone('Phone: ')
-    email = validate_email('Email: ')
+    print('Step 1/6')
+    name = validate_name_fname('0: Main menu\n\nName: ')
+    if name == '0':
+        return
+    
+    clear_terminal()
+    print('***Create account***')
+    print('Step 2/6')
+    fname = validate_name_fname('0: Main menu\n\nSurname: ')
+    if fname == '0':
+        return
+    
+    clear_terminal()
+    print('***Create account***')
+    print('Step 3/6')
+    national_id = validate_national_id('0: Main menu\n\nNational id: ')
+    if national_id == '0':
+        return
+    
+    clear_terminal()
+    print('***Create account***')
+    print('Step 4/6')
+    password = validate_password('0: Main menu\n\nPassword: ')
+    if password == '0':
+        return
+    
+    clear_terminal()
+    print('***Create account***')
+    print('Step 5/6')
+    phone = validate_phone('0: Main menu\n\nPhone: ')
+    if phone == '0':
+        return
+    
+    clear_terminal()
+    print('***Create account***')
+    print('Step 6/6')
+    email = validate_email('0: Main menu\n\nEmail: ')
+    if email == '0':
+        return
+    
     is_human = captcha_check()
     if not is_human:
         print_red("Captcha doesn't match, please try again")
@@ -99,7 +132,9 @@ def log_in(system):
         attempts =0
         while attempts < 3:
             clear_terminal()
-            acc_id = input('Account Number: ').strip()
+            acc_id = input('0: Main menu\n\nAccount Number:\n>>>: ').strip()
+            if acc_id == '0':
+                return
             password = getpass.getpass('Password: 🔑 ').strip()
             user_acc = system.get('accounts',{}).get(acc_id)
             is_human = captcha_check()
@@ -293,7 +328,7 @@ def captcha_check():
 def main():
     system = init_system()
     print('System loaded/initialized')
-    pause()
+    pause(1)
     while True:
         clear_terminal()
         user_choice = menu()
