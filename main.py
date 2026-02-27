@@ -8,10 +8,27 @@ import pyfiglet
 from bank.verification.email_verification import send_email_gmail
 import os
 
+BANK_NAME = "VaulT - Tech Bank"
+TAGLINE = "Secure • Fast • Reliable"
+
+ANSI = {
+    "reset": "\033[0m",
+    "cyan": "\033[96m",
+    "green": "\033[92m",
+    "yellow": "\033[93m",
+    "red": "\033[91m",
+}
+def show_logo():
+    art = pyfiglet.figlet_format(BANK_NAME, font='small')
+
+    print(ANSI["cyan"] + art + ANSI["reset"])
+    print(ANSI["yellow"] + f"{TAGLINE.center(50)}" + ANSI["reset"])
+    print(ANSI["cyan"] + ("═" * 50) + ANSI["reset"])
+
 
 def clear_terminal():
     os.system('cls' if os.name == 'nt' else 'clear')
-    # print banner
+    show_logo()
 
 def pause(seconds= 2):
     time.sleep(seconds)
@@ -193,7 +210,6 @@ def show_user_info(name, fname, national_id, phone, email):
     if user_choice == '0':
         return
 
-
 def user_transfer(system, acc_id):
     clear_terminal()
     print("\n*** Transfer ***")
@@ -255,16 +271,13 @@ def user_batch_transfer(system, acc_id):
 
     input("\nPress Enter to continue...")
 
-
-
 def captcha_check():
+    os.system('cls' if os.name == 'nt' else 'clear')
     chars = list('ABCDEFGHJKLMNPQRSTUVWXYZ23456789')
     code = "".join(random.choices(chars, k=5))
     print(pyfiglet.figlet_format(code, font="standard"))
     ans = input("Type CAPTCHA: ").strip()
     return ans == code
-
-
 
 def main():
     system = init_system()
