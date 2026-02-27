@@ -28,7 +28,7 @@ Vault-Tech Bank — Security Team 🔐
 """)
     with open("bank/verification/logo.png", "rb") as f:
         logo = f.read()
-    msg.add_attachment(logo, maintype="image", subtype="jpeg", filename="logo.jpg")
+    msg.add_attachment(logo, maintype="image", subtype="png", filename="logo.jpg")
 
 
 

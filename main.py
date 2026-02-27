@@ -51,11 +51,13 @@ def type_red(text, delay=0.06, end="\n"):
 
 def show_logo():
     art = pyfiglet.figlet_format(BANK_NAME, font='small')
+    print(ANSI["cyan"] + ("═" *30) + ANSI["reset"])
     print(ANSI["cyan"] + ("═" *50)+ '\n' + ANSI["reset"])
 
     print(ANSI["cyan"] + art + ANSI["reset"])
     print(ANSI["yellow"] + f"{TAGLINE.center(50)}" + ANSI["reset"])
     print(ANSI["cyan"] + ("═" * 50) + ANSI["reset"])
+    print(ANSI["cyan"] + ("═" * 30) + ANSI["reset"])
 
 def clear_terminal():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -65,7 +67,7 @@ def pause(seconds= 2):
     time.sleep(seconds)
 
 def menu():
-    type_print('Select one option:\n')
+    type_print('\nSelect one option:\n')
     user_menu = input('\n1: Log in\n2: Create account\n\n\n0: Exit\n>>>: ').strip()
     return user_menu
 
@@ -257,6 +259,7 @@ def log_in_menu(system, acc_id, user_acc):
         print("1: View your profile")
         print("2: Transfer")
         print("3: Batch transfer")
+        print("4: Create card(Comming Soon)")
         print("\n\n0: Logout")
         choice = input(">>> ").strip()
 
