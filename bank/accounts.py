@@ -3,7 +3,6 @@ import string
 from copy import deepcopy
 from datetime import datetime
 from datetime import date
-from operator import truediv
 from uuid import uuid4
 # from .decorators import validate_transaction
 def collect_account_fields(system, key_1, key_2):
@@ -21,7 +20,7 @@ def create_expiration_date():
     expiration_date = now.replace(year=now.year + 5)
     return now.isoformat(), expiration_date.isoformat()
 
-def accnumber_cvv_cartnumber_(prefix = "6037", length=16):
+def accnumber_cvv_cardnumber_(prefix = "6037", length=16):
     length_1 = length - len(prefix)
     random_number =''
     random_number += ''.join(secrets.choice(string.digits)for _ in range(length_1))
@@ -54,16 +53,16 @@ def resolve_account_number(system, identifier):
         return identifier
 
     for account_id, account_data in accounts.items():
-        cart_data = account_data.get("cart_data")
+        card_data = account_data.get("card_data")
 
-        if not isinstance(cart_data, dict):
+        if not isinstance(card_data, dict):
             continue
 
-        card_number = cart_data.get("cart_number")
+        card_number = card_data.get("card_number")
 
         if card_number and str(card_number).strip().replace(" ", "") == identifier:
 
-            if cart_data.get("status") == "Expired":
+            if card_data.get("status") == "Expired":
                 raise ValueError("Card is expired")
 
             return account_id
@@ -83,7 +82,7 @@ def create_account(system, initial_balance, owner, account_type="Current"):
     if not isinstance(owner, dict):
         raise TypeError("Owner must be a dictionary")
     while True:
-        account_number = accnumber_cvv_cartnumber_(prefix="", length=13)
+        account_number = accnumber_cvv_cardnumber_(prefix="", length=13)
         if account_number not in system["accounts"]:
             break
 
@@ -249,25 +248,25 @@ def batch_transfer(system, from_acc, amount, file_name, description=""):
         "status": "Batch completed"
     }
 
-def create_cart(system, account_number):
+def create_card(system, account_number):
     person_data = deepcopy(system["accounts"][account_number])
-    card_numbers = set(collect_account_fields(system, "cart_data", "cart_number"))
-    cart_data = person_data.setdefault("cart_data", {})
+    card_numbers = set(collect_account_fields(system, "card_data", "card_number"))
+    card_data = person_data.setdefault("card_data", {})
     while True:
-        cart_number = accnumber_cvv_cartnumber_()
-        if cart_number not in card_numbers:
-            cart_data["cart_number"] = cart_number
-            cart_data["cvv"] = accnumber_cvv_cartnumber_(prefix='', length=3)
-            cart_data["status"] = "Active"
+        card_number = accnumber_cvv_cardnumber_()
+        if card_number not in card_numbers:
+            card_data["card_number"] = card_number
+            card_data["cvv"] = accnumber_cvv_cardnumber_(prefix='', length=3)
+            card_data["status"] = "Active"
             break
     expiration_date = create_expiration_date()
-    cart_data["create_date"] = expiration_date[0]
-    cart_data["expiration_date"] = expiration_date[1]
+    card_data["create_date"] = expiration_date[0]
+    card_data["expiration_date"] = expiration_date[1]
     system["accounts"][account_number] = person_data
 
     return {
             "account_id": account_number,
-            "card_number": cart_data["cart_number"],
+            "card_number": card_data["card_number"],
             "status": "Card successfully created"
     }
 
@@ -276,18 +275,18 @@ def deactivate_expired_cards(system):
     updated_accounts = []
 
     for acc_id, acc in system.get("accounts", {}).items():
-        cart_data = acc.get("cart_data")
-        if not isinstance(cart_data, dict):
+        card_data = acc.get("card_data")
+        if not isinstance(card_data, dict):
             continue
 
-        exp_str = cart_data.get("expiration_date")
+        exp_str = card_data.get("expiration_date")
         if not exp_str:
             continue
 
         exp_date = date.fromisoformat(exp_str)
 
         if today > exp_date:
-            cart_data["status"] = "Expired"
+            card_data["status"] = "Expired"
             updated_accounts.append(acc_id)
 
     return updated_accounts
