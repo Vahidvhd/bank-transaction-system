@@ -13,11 +13,15 @@ def clear_terminal():
     os.system('cls' if os.name == 'nt' else 'clear')
     # print banner
 
+def pause(seconds= 2):
+    time.sleep(seconds)
+
 def menu():
     user_menu = input('Select one option:\n1: Log in\n2: Create account\n\n\n0: Exit\n>>>: ').strip()
     return user_menu
 
 def create_acc(system):
+    clear_terminal()
     print('***Create account***')
 
     name = validate_name_fname('Name: ')
@@ -29,6 +33,7 @@ def create_acc(system):
     is_human = captcha_check()
     if not is_human:
         print("Captcha doesn't match, please try again")
+        pause()
         return
 
     owner_dict ={
@@ -49,19 +54,23 @@ def create_acc(system):
             break
         except ValueError:
             print('Initial balance cannot contain any letters of special characters')
+            pause()
             continue
     
     try:
         result = create_account(system, init_amount, owner_dict)
         save_system(system)
         print(f"{result['status']}\nAccount number: {result['account_id']}\nBalance: {result['balance']}")
+        pause(4)
     except (TypeError , ValueError) as e:
         print('Error', e)
+        pause()
 
 def log_in(system):  
     while True: 
         attempts =0
         while attempts < 3:
+            clear_terminal()
             acc_id = input('Account Number: ').strip()
             password = getpass.getpass('Password: 🔑 ').strip()
             user_acc = system.get('accounts',{}).get(acc_id)
@@ -69,13 +78,16 @@ def log_in(system):
             if not is_human:
                 attempts += 1
                 print(f"Captcha doesn't match, please try again ({3-attempts} left)")
+                pause()
                 continue
             if not user_acc or user_acc['owner']['password'] != password:
                 attempts += 1
                 print(f'Invalid account number or password ({3-attempts} left)')
+                pause()
                 continue
             else:
                 print(f"Welcome {user_acc['owner']['name']}")
+                pause(1)
                 log_in_menu(system, acc_id, user_acc)
                 return
         
@@ -84,9 +96,11 @@ def log_in(system):
             print(f'{i} ...')
             time.sleep(1)
         print('\nYou can try again now.\n')
+        pause(1)
 
 def forgot_pass(system):
     while True:
+        clear_terminal()
         print("\n*** Forgot Password ***")
         forgot_menu= input("1: Get password by email\n\n2: Back\n>>>: ").strip()
         if forgot_menu == '1': 
@@ -108,9 +122,11 @@ def forgot_pass(system):
             return
         else:
             print('Invalid option')
+            pause()
             continue
 
 def log_in_options(system):
+    clear_terminal()
     print('***Log in***')
     login_menu = input('1: Log in with Account Number & Password\n2: Forgot Password\n\n\n0: Back\n>>>: ').strip()
     if login_menu == '1':
@@ -121,13 +137,16 @@ def log_in_options(system):
         return
     else:
         print('Invalid option')
+        pause()
 
 def log_in_menu(system, acc_id, user_acc):
     while True:
+        clear_terminal() 
         user_acc = system.get('accounts', {}).get(acc_id)
 
         if not user_acc:
             print('Account not found.')
+            pause()
             return
 
         owner = user_acc.get('owner')
@@ -155,12 +174,15 @@ def log_in_menu(system, acc_id, user_acc):
             user_batch_transfer(system, acc_id)
         elif choice == "0":
             print("Logged out.\n")
+            pause(1)
             return
         else:
             print("Invalid option.")
+            pause()
 
 
 def show_user_info(name, fname, national_id, phone, email):
+    clear_terminal() 
     print("\n***My info***\n\n")
     print(f'Name: {name}')
     print(f'Family Name: {fname}')
@@ -173,6 +195,7 @@ def show_user_info(name, fname, national_id, phone, email):
 
 
 def user_transfer(system, acc_id):
+    clear_terminal()
     print("\n*** Transfer ***")
     to_acc = input("Destination (Account/Card number): ").strip()
 
@@ -183,6 +206,7 @@ def user_transfer(system, acc_id):
             break
         except ValueError:
             print("Amount must be numeric.")
+            pause()
 
     info = input("Description (optional): ").strip()
 
@@ -192,12 +216,15 @@ def user_transfer(system, acc_id):
         print("\n", result["status"])
         print("From balance:", result["from_balance"])
         print("To balance:", result["to_balance"])
+        pause()
     except Exception as e:
         print("\nTransfer failed:", e)
+        print()
 
     input("\nPress Enter to continue...")    
 
 def user_batch_transfer(system, acc_id):
+    clear_terminal()     
     print("\n*** Batch Transfer ***")
     file_name = input("CSV file path (one account/card per line): ").strip()
 
@@ -208,6 +235,7 @@ def user_batch_transfer(system, acc_id):
             break
         except ValueError:
             print("Amount must be numeric.")
+            pause()
 
     info = input("Description (optional): ").strip()
 
@@ -220,29 +248,12 @@ def user_batch_transfer(system, acc_id):
         print("Failed:", result["failed"])
         if result["failed_accounts"]:
             print("Failed accounts:", result["failed_accounts"])
+        pause()
     except Exception as e:
         print("\nBatch transfer failed:", e)
+        pause()
 
     input("\nPress Enter to continue...")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -258,17 +269,24 @@ def captcha_check():
 def main():
     system = init_system()
     print('System loaded/initialized')
+    pause()
     while True:
+        clear_terminal()
         user_choice = menu()
         if user_choice == '1':
             log_in_options(system)
         elif user_choice == '2':
             create_acc(system)
         elif user_choice == '0':
-            print('Exit (Not completed yet)')
+            print('Exiting system...')
+            pause()
+            save_system(system)
+            print('Goodbye')
+            pause(1)
             break
         else:
             print('Invalid option')
+            pause()
             continue
 
 if __name__ == "__main__":
