@@ -18,6 +18,17 @@ ANSI = {
     "yellow": "\033[93m",
     "red": "\033[91m",
 }
+
+def print_green(*args, **kwargs):
+    print(ANSI["green"], end="")
+    print(*args, **kwargs)
+    print(ANSI["reset"], end="")
+
+def print_red(*args, **kwargs):
+    print(ANSI["red"], end="")
+    print(*args, **kwargs)
+    print(ANSI["reset"], end="")
+
 def show_logo():
     art = pyfiglet.figlet_format(BANK_NAME, font='small')
 
@@ -49,7 +60,7 @@ def create_acc(system):
     email = validate_email('Email: ')
     is_human = captcha_check()
     if not is_human:
-        print("Captcha doesn't match, please try again")
+        print_red("Captcha doesn't match, please try again")
         pause()
         return
 
@@ -70,17 +81,17 @@ def create_acc(system):
             init_amount = float(init_amount)
             break
         except ValueError:
-            print('Initial balance cannot contain any letters of special characters')
+            print_red('Initial balance cannot contain any letters of special characters')
             pause()
             continue
     
     try:
         result = create_account(system, init_amount, owner_dict)
         save_system(system)
-        print(f"{result['status']}\nAccount number: {result['account_id']}\nBalance: {result['balance']}")
+        print_green(f"{result['status']}\nAccount number: {result['account_id']}\nBalance: {result['balance']}")
         pause(4)
     except (TypeError , ValueError) as e:
-        print('Error', e)
+        print_red('Error', e)
         pause()
 
 def log_in(system):  
@@ -94,21 +105,21 @@ def log_in(system):
             is_human = captcha_check()
             if not is_human:
                 attempts += 1
-                print(f"Captcha doesn't match, please try again ({3-attempts} left)")
+                print_red(f"Captcha doesn't match, please try again ({3-attempts} left)")
                 pause()
                 continue
             if not user_acc or user_acc['owner']['password'] != password:
                 attempts += 1
-                print(f'Invalid account number or password ({3-attempts} left)')
+                print_red(f'Invalid account number or password ({3-attempts} left)')
                 pause()
                 continue
             else:
-                print(f"Welcome {user_acc['owner']['name']}")
+                print_green(f"Welcome {user_acc['owner']['name']}")
                 pause(1)
                 log_in_menu(system, acc_id, user_acc)
                 return
         
-        print('\nToo many failed attempts. Please wait 10 seconds.\n')
+        print_red('\nToo many failed attempts. Please wait 10 seconds.\n')
         for i in range(10, 0, -1):
             print(f'{i} ...')
             time.sleep(1)
@@ -138,7 +149,7 @@ def forgot_pass(system):
         elif forgot_menu == '2':
             return
         else:
-            print('Invalid option')
+            print_red('Invalid option')
             pause()
             continue
 
@@ -153,7 +164,7 @@ def log_in_options(system):
     elif login_menu == '0':
         return
     else:
-        print('Invalid option')
+        print_red('Invalid option')
         pause()
 
 def log_in_menu(system, acc_id, user_acc):
@@ -162,7 +173,7 @@ def log_in_menu(system, acc_id, user_acc):
         user_acc = system.get('accounts', {}).get(acc_id)
 
         if not user_acc:
-            print('Account not found.')
+            print_red('Account not found.')
             pause()
             return
 
@@ -194,7 +205,7 @@ def log_in_menu(system, acc_id, user_acc):
             pause(1)
             return
         else:
-            print("Invalid option.")
+            print_red("Invalid option.")
             pause()
 
 
@@ -221,7 +232,7 @@ def user_transfer(system, acc_id):
             amount = float(amount_str)
             break
         except ValueError:
-            print("Amount must be numeric.")
+            print_red("Amount must be numeric.")
             pause()
 
     info = input("Description (optional): ").strip()
@@ -229,12 +240,12 @@ def user_transfer(system, acc_id):
     try:
         result = transfer(system, acc_id, to_acc, amount, info)
         save_system(system)
-        print("\n", result["status"])
+        print_green("\n", result["status"])
         print("From balance:", result["from_balance"])
         print("To balance:", result["to_balance"])
         pause()
     except Exception as e:
-        print("\nTransfer failed:", e)
+        print_red("\nTransfer failed:", e)
         print()
 
     input("\nPress Enter to continue...")    
@@ -250,7 +261,7 @@ def user_batch_transfer(system, acc_id):
             amount = float(amount_str)
             break
         except ValueError:
-            print("Amount must be numeric.")
+            print_red("Amount must be numeric.")
             pause()
 
     info = input("Description (optional): ").strip()
@@ -258,7 +269,7 @@ def user_batch_transfer(system, acc_id):
     try:
         result = batch_transfer(system, acc_id, amount, file_name, info)
         save_system(system)
-        print("\n", result["status"])
+        print_green("\n", result["status"])
         print("Total:", result["total_transfers"])
         print("Successful:", result["successful"])
         print("Failed:", result["failed"])
@@ -266,7 +277,7 @@ def user_batch_transfer(system, acc_id):
             print("Failed accounts:", result["failed_accounts"])
         pause()
     except Exception as e:
-        print("\nBatch transfer failed:", e)
+        print_red("\nBatch transfer failed:", e)
         pause()
 
     input("\nPress Enter to continue...")
@@ -298,7 +309,7 @@ def main():
             pause(1)
             break
         else:
-            print('Invalid option')
+            print_red('Invalid option')
             pause()
             continue
 
