@@ -2,6 +2,7 @@ import smtplib
 from email.message import EmailMessage
 import os
 
+
 def send_email_gmail(to_email, password, name, fname):
     gmail_user = os.environ.get("GMAIL_USER")
     gmail_app_pass = os.environ.get("GMAIL_APP_PASS")
