@@ -31,11 +31,11 @@ def print_red(*args, **kwargs):
 
 def show_logo():
     art = pyfiglet.figlet_format(BANK_NAME, font='small')
+    print(ANSI["cyan"] + ("═" *50)+ '\n' + ANSI["reset"])
 
     print(ANSI["cyan"] + art + ANSI["reset"])
     print(ANSI["yellow"] + f"{TAGLINE.center(50)}" + ANSI["reset"])
     print(ANSI["cyan"] + ("═" * 50) + ANSI["reset"])
-
 
 def clear_terminal():
     os.system('cls' if os.name == 'nt' else 'clear')

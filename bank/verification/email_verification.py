@@ -25,7 +25,7 @@ If you did not request this, please ignore this email. For your security, we rec
 Stay safe,
 Vault-Tech Bank — Security Team 🔐
 """)
-    with open("bank/verification/logo.jpg", "rb") as f:
+    with open("bank/verification/logo.png", "rb") as f:
         logo = f.read()
     msg.add_attachment(logo, maintype="image", subtype="jpeg", filename="logo.jpg")
 
