@@ -5,6 +5,8 @@ from datetime import datetime
 from datetime import date
 from uuid import uuid4
 from .decorators import validate_transaction
+
+
 def collect_account_fields(system, key_1, key_2):
     result = []
     for acc in system.get("accounts", {}).values():
