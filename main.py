@@ -30,21 +30,21 @@ def print_red(*args, **kwargs):
     print(*args, **kwargs)
     print(ANSI["reset"], end="")
 
-def type_print(text, delay=0.06, end="\n"):
+def type_print(text, delay=0.05, end="\n"):
     for ch in str(text):
         print(ch, end="", flush=True)
         time.sleep(delay)
     print(end, end="", flush=True)
 
-def type_color(text, color="reset", delay=0.06, end="\n"):
+def type_color(text, color="reset", delay=0.05, end="\n"):
     print(ANSI.get(color, ANSI["reset"]), end="")
     type_print(text, delay=delay, end=end)
     print(ANSI["reset"], end="")
 
-def type_green(text, delay=0.06, end="\n"):
+def type_green(text, delay=0.05, end="\n"):
     type_color(text, color="green", delay=delay, end=end)
 
-def type_red(text, delay=0.06, end="\n"):
+def type_red(text, delay=0.05, end="\n"):
     type_color(text, color="red", delay=delay, end=end)
 
     
@@ -53,7 +53,6 @@ def show_logo():
     art = pyfiglet.figlet_format(BANK_NAME, font='small')
     print(ANSI["cyan"] + ("═" *30) + ANSI["reset"])
     print(ANSI["cyan"] + ("═" *50)+ '\n' + ANSI["reset"])
-
     print(ANSI["cyan"] + art + ANSI["reset"])
     print(ANSI["yellow"] + f"{TAGLINE.center(50)}" + ANSI["reset"])
     print(ANSI["cyan"] + ("═" * 50) + ANSI["reset"])
@@ -196,13 +195,13 @@ def log_in(system):
 def forgot_pass(system):
     while True:
         clear_terminal()
-        print("\n*** Forgot Password ***")
+        type_print("\n*** Forgot Password ***")
         forgot_menu= input("1: Get password by email\n\n2: Back\n>>>: ").strip()
         if forgot_menu == '1': 
             clear_terminal()
             national_id = input('National id Number: ')
             email = input('Email: ')
-            print('If the information you provided matches an existing account, we’ll send an email to the address you entered. Please also check your Spam/Junk folder.')
+            type_print('If the information you provided matches an existing account, we’ll send an email to the address you entered. Please also check your Spam/Junk folder.')
             for acc_id, acc_data in system.get('accounts', {}).items():
                 owner = acc_data.get('owner', {})
                 if owner.get('national_id')== national_id and owner.get('contact', {}).get('email') == email:
@@ -259,7 +258,11 @@ def log_in_menu(system, acc_id, user_acc):
         print("1: View your profile")
         print("2: Transfer")
         print("3: Batch transfer")
-        print("4: Create card(Comming Soon)")
+        print("4: Create card (Comming Soon)")
+        print("5: Referal code (Comming Soon)")
+        print("6: Freeze/Unfreeze card (Comming Soon)")
+        print("7: Recent transactions (Comming Soon)")
+        print("8: Security settings -Change password -Enable 2FA (Comming Soon)")
         print("\n\n0: Logout")
         choice = input(">>> ").strip()
 
