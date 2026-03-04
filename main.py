@@ -374,11 +374,11 @@ def main():
         elif user_choice == '2':
             create_acc(system)
         elif user_choice == '0':
-            type_print('Exiting system...')
-            pause()
+            type_print('Saving system data...')
             save_system(system)
-            print('Goodbye')
-            pause(1)
+            type_green('System saved successfully.')
+            type_print('Goodbye!')
+            pause(1)            
             break
         else:
             type_red('Invalid option')
