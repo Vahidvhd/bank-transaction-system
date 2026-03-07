@@ -182,7 +182,7 @@ def log_in(system):
             else:
                 type_green(f"Welcome {user_acc['owner']['name']}")
                 pause(1)
-                log_in_menu(system, acc_id, user_acc)
+                log_in_menu(system, acc_id)
                 return
         
         type_red('\nToo many failed attempts. Please wait 10 seconds.\n')
@@ -234,11 +234,11 @@ def log_in_options(system):
         type_red('Invalid option')
         pause()
 
-def log_in_menu(system, acc_id, user_acc):
+def log_in_menu(system, acc_id):
     while True:
-        clear_terminal() 
+        clear_terminal()
+        
         user_acc = system.get('accounts', {}).get(acc_id)
-
         if not user_acc:
             type_red('Account not found.')
             pause()
@@ -258,11 +258,11 @@ def log_in_menu(system, acc_id, user_acc):
         print("1: View your profile")
         print("2: Transfer")
         print("3: Batch transfer")
-        print("4: Create card (Comming Soon)")
-        print("5: Referal code (Comming Soon)")
-        print("6: Freeze/Unfreeze card (Comming Soon)")
-        print("7: Recent transactions (Comming Soon)")
-        print("8: Security settings -Change password -Enable 2FA (Comming Soon)")
+        print("4: Create card (Coming Soon)")
+        print("5: Referral code (Coming Soon)")
+        print("6: Freeze/Unfreeze card (Coming Soon)")
+        print("7: Recent transactions")
+        print("8: Security settings -Change password -Enable 2FA (Coming Soon)")
         print("\n\n0: Logout")
         choice = input(">>> ").strip()
 
@@ -272,6 +272,20 @@ def log_in_menu(system, acc_id, user_acc):
             user_transfer(system, acc_id)
         elif choice == "3":
             user_batch_transfer(system, acc_id)
+        elif choice == "4":
+            type_red("Coming soon.")
+            pause()
+        elif choice == "5":
+            type_red("Coming soon.")
+            pause()
+        elif choice == "6":
+            type_red("Coming soon.")
+            pause()
+        elif choice == "7":
+            show_transactions(system, acc_id)
+        elif choice == "8":
+            type_red("Coming soon.")
+            pause()
         elif choice == "0":
             type_print("Logged out.\n")
             pause(1)
@@ -361,6 +375,36 @@ def captcha_check():
     print(pyfiglet.figlet_format(code, font="standard"))
     ans = input("Type CAPTCHA: ").strip()
     return ans == code
+
+def show_transactions(system, acc_id):
+    clear_terminal()
+    type_print("\n*** Recent Transactions ***\n")
+
+    account = system.get("accounts", {}).get(acc_id)
+    if not account:
+        type_red("Account not found.")
+        input("\nPress Enter to return...")
+        return
+
+    txs = account.get("transactions", [])
+
+    if not txs:
+        type_red("No transactions yet.")
+        input("\nPress Enter to return...")
+        return
+
+    print("DATE                 TYPE            AMOUNT        BALANCE")
+    print("-------------------------------------------------------------")
+
+    for tx in txs[-10:][::-1]:
+        date = tx.get("time", "")
+        ttype = tx.get("type", "")
+        amount = tx.get("amount", "")
+        balance = tx.get("balance_after", "")
+
+        print(f"{date:<20} {ttype:<15} {amount:<12} {balance}")
+
+    input("\nPress Enter to return...")
 
 def main():
     system = init_system()
