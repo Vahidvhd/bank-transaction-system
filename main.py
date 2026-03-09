@@ -253,7 +253,7 @@ def log_in_menu(system, acc_id):
         email = user_acc.get('owner', {}).get('contact', {}).get('email')
 
         print("\n***Dashboard***\n")
-        print(f'Welcome {name} {fname}                  Balance: {balance}')
+        print(f'Welcome {name} {fname}                  Balance: {balance:.2f} USD')
 
         print("1: View your profile")
         print("2: Transfer")
