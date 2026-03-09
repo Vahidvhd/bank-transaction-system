@@ -399,10 +399,10 @@ def show_transactions(system, acc_id):
     for tx in txs[-10:][::-1]:
         date = tx.get("time", "")
         ttype = tx.get("type", "")
-        amount = tx.get("amount", "")
-        balance = tx.get("balance_after", "")
+        amount = float(tx.get("amount", 0))
+        balance = float(tx.get("balance_after", 0))
 
-        print(f"{date:<20} {ttype:<15} {amount:<12} {balance}")
+        print(f"{date:<20} {ttype:<15} {amount:<12.2f} {balance:.2f}")
 
     input("\nPress Enter to return...")
 
