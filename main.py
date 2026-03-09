@@ -253,7 +253,7 @@ def log_in_menu(system, acc_id):
         email = user_acc.get('owner', {}).get('contact', {}).get('email')
 
         print("\n***Dashboard***\n")
-        print(f'Welcome {name} {fname}                  Balance: {balance}')
+        print(f'Welcome {name} {fname}                  Balance: {balance:.2f} USD')
 
         print("1: View your profile")
         print("2: Transfer")
@@ -399,10 +399,10 @@ def show_transactions(system, acc_id):
     for tx in txs[-10:][::-1]:
         date = tx.get("time", "")
         ttype = tx.get("type", "")
-        amount = tx.get("amount", "")
-        balance = tx.get("balance_after", "")
+        amount = float(tx.get("amount", 0))
+        balance = float(tx.get("balance_after", 0))
 
-        print(f"{date:<20} {ttype:<15} {amount:<12} {balance}")
+        print(f"{date:<20} {ttype:<15} {amount:<12.2f} {balance:.2f}")
 
     input("\nPress Enter to return...")
 
